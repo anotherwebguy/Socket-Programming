@@ -4,7 +4,7 @@
 #include<sys/socket.h>
 #include<string.h>
 #include<netinet/in.h>
-#include <unistd.h>
+#include<unistd.h>
 
 void error(const char *msg)
 {
@@ -52,20 +52,26 @@ int main(int argc, char *argv[])
 	
 	while(1)
 	{
-		bzero(buffer, 1024-1);
-		n = read(newsockfd, buffer, 1024-1);
-		if(n < 0) 
+		bzero(buffer, 1024);
+		n = read(newsockfd, buffer, 1024);
+		if (n < 0)
 		{
-			error("Error on reading");
+		    error("Error on reading");
 		}
-		printf("Client : %s",buffer);
-		bzero(buffer, 1024-1);
-		fgets(buffer, 1024-1, stdin);
-		
-		n = write(newsockfd, buffer, sizeof(buffer));
+		printf("Client: %s\n", buffer);
+
+		bzero(buffer, 1024);
+		printf("You: ");
+		fgets(buffer, 1024, stdin);
+
+		size_t len = strlen(buffer);
+		if (len > 0 && buffer[len-1] == '\n')
+		    buffer[len-1] = '\0';
+
+		n = write(newsockfd, buffer, strlen(buffer));
 		if(n < 0) 
 		{
-			error("Error on reading");
+			error("Error on writing");
 		}
 		int i = strncmp("Bye",buffer,3);
 		if(i == 0) 
